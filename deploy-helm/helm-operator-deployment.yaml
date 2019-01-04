@@ -54,6 +54,20 @@ spec:
       #     secretName: flux-helm-repositories
       # - name: repositories-cache
       #   emptyDir: {}
+      #
+      # The following two volumes are for TLS support; they use
+      # - a TLS secret storing cert and key, created as described in
+      #   https://github.com/weaveworks/flux/blob/master/site/helm-operator.md
+      # - a config map storing the ca cert, that looks as follows:
+      #   https://github.com/weaveworks/flux/blob/master/chart/flux/templates/helm-tls.yaml
+      # - name: helm-tls-certs
+      #   secret:
+      #     secretName: helm-client-certs
+      #     defaultMode: 0400
+      # - name: helm-tls-ca
+      #   configMap:
+      #     name: weave-flux-helm-tls-ca-config
+      #     defaultMode: 0600
 
       containers:
       - name: flux-helm-operator
@@ -78,3 +92,20 @@ spec:
         #   mountPath: /var/fluxd/helm/repository
         # - name: repositories-cache
         #   mountPath: /var/fluxd/helm/repository/cache
+        #
+        # Volume mounts for TLS support
+        # - name: helm-tls-certs
+        #   mountPath: /etc/fluxd/helm
+        #   readOnly: true
+        # - name: helm-tls-ca
+        #   mountPath: /etc/fluxd/helm-ca
+        #   readOnly: true
+        #
+        # Args for TLS support
+        # args:
+        #  - --tiller-tls-key-path=/etc/fluxd/helm/tls.key
+        #  - --tiller-tls-enable=true
+        #  - --tiller-tls-cert-path=/etc/fluxd/helm/tls.crt
+        #  - --tiller-tls-verify=true
+        #  - --tiller-tls-ca-cert-path=/etc/fluxd/helm-ca/ca.crt
+        # # - --tiller-tls-hostname="" # override if desired
